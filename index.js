@@ -20,47 +20,47 @@ connection.connect(function(err) {
 function start() {
     inquirer.prompt([
         {
-            type: "checkbox",
-            message: "What would you like to do?",
-            name: "options",
-            choices: [
-                "View all Employees?",
-                "View all Personas",
-                "View all Departments",
-                "Add a new Employee",
-                "Add a new Persona",
-                "Update Employee Personas",
-                "Add a new Department",
-                "View Budgets and Employee Salaries",
-                "Click Here to Exit"
+        type: "checkbox",
+        message: "What would you like to do?",
+        name: "options",
+        choices: [
+            "View all Employees?",
+            "View all Personas",
+            "View all Departments",
+            "Add a new Employee",
+            "Add a new Persona",
+            "Update Employee Personas",
+            "Add a new Department",
+            "View Budgets and Employee Salaries",
+            "Click Here to Exit"
             ]
         }])
         .then(function (answer) {
             switch (answer.options) {
-                case "View all Employees?":
-                    viewEmployees();
-                    break;
-                case "View all Personas":
-                    viewPersonas();
-                    break;
-                case "View all Departments":
-                    viewDepartments();
-                    break;
-                case "Add a new Employee":
-                    addEmployee();
-                    break;
-                case "Add a new Persona":
-                    addPersona();
-                    break;
-                case "Update Employee Personas":
-                    selectEmp();
-                    break;
-                case "Add a new Department":
-                    addDepartment();
-                    break;
-                case "Click Here to Exit":
-                    connection.end();
-                    break;
+            case "View all Employees?":
+                viewEmployees();
+                break;
+            case "View all Personas":
+                viewPersonas();
+                break;
+            case "View all Departments":
+                viewDepartments();
+                break;
+            case "Add a new Employee":
+                addEmployee();
+                break;
+            case "Add a new Persona":
+                addPersona();
+                break;
+            case "Update Employee Personas":
+                selectEmp();
+                break;
+            case "Add a new Department":
+                addDepartment();
+                break;
+            case "Exit the program here":
+                connection.end();
+                break;
             }
         });
 };
@@ -94,7 +94,38 @@ function viewDepartments() {
 
 
 // -- ADDITIONS -- // ---  departments, personas, employees --- //
-
+function addEmployee() {
+    connection.query("SELECT * FROM personas", function(err, res) {
+        if (err) 
+        throw err;
+        console.log(results);
+        inquirer.prompt([
+            {
+            name: "firstName",
+            type: "input",
+            message: "What is the employees First Name?"
+            },
+            {
+            name: "lastName",
+            type: "input",
+            message: "What is the employees Last Name?"   
+            },
+            {
+            name: "perosonaId",
+            type: "list",
+            message: "What will be the employee's work Persona?",
+            choices: [
+                "Salesperson",
+                "Sales Manager",
+                "Engineer",
+                "Account Executive",
+                "Vice President",
+                "Regional Manager"
+                ]
+            }
+        ])
+    })
+};
 
 // -- UPDATES -- // -- employees, roles //
 
