@@ -3,6 +3,9 @@
 ## Description
 Employee Tracker is a Content Managment System built as a commnand line application. The program allows for full department and employee tracking through a relationship database that connects departments, manageers, employess and respective roles or personas in the organization. 
 
+## DEMO
+![](./emptracker.gif)
+
 ## Features
 Employee Tracker includes the following features:
 * Add departments, roles, employees

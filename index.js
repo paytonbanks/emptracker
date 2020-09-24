@@ -18,30 +18,31 @@ connection.connect(function(err) {
 
 // -- APPLICATION START -- //
 function start() {
+
     inquirer.prompt([
         {
-        type: "checkbox",
-        message: "What would you like to do?",
-        name: "options",
-        choices: [
-            "View all Employees?",
-            "View all Personas",
-            "View all Departments",
-            "Add a new Employee",
-            "Add a new Persona",
-            "Update Employee Personas",
-            "Add a new Department",
-            "View Budgets and Employee Salaries",
-            "Click Here to Exit"
-            ]
+            type: "list",
+            message: "What would you like to do?",
+            name: "action",
+            choices: [
+                "View all Employees?",
+                "View all Personas",
+                "View all Departments",
+                "Add a new Employee",
+                "Add a new Persona",
+                "Update Employee Personas",
+                "Add a new Department",
+                "View Budgets and Employee Salaries",
+                "Click Here to Exit"
+                ]
         }])
         .then(function (answer) {
-            switch (answer.options) {
-            case "View all Employees?":
-                viewEmployees();
+            switch (answer.action) {
+            case "View all Employees?": 
+                viewEmployees(); 
                 break;
             case "View all Personas":
-                viewPersonas();
+                viewPersona();
                 break;
             case "View all Departments":
                 viewDepartments();
@@ -74,7 +75,7 @@ function viewEmployees() {
     })
 };
 
-function viewPersonas() {
+function viewPersona() {
     connection.query(`SELECT * FROM persona`, function (err, res) {
         if (err) throw err;
         console.table(res);
@@ -93,9 +94,10 @@ function viewDepartments() {
 
 
 
-// -- ADDITIONS -- // ---  departments, personas, employees --- //
+// -- CREATE -- // ---  Employess, Persona & Department --- \\
+
 function addEmployee() {
-    connection.query("SELECT * FROM personas", function(err, res) {
+    connection.query("SELECT * FROM persona", function(err, res) {
         if (err) 
         throw err;
         console.log(results);
@@ -127,7 +129,107 @@ function addEmployee() {
     })
 };
 
-// -- UPDATES -- // -- employees, roles //
+function addDepartment() {
+    inquirer.prompt([
+        {
+        name: "addDepartment",
+        message: "Enter Department Name?"
+        }
+    ]).then(function(answer) {
+        connection.query(
+            "INSERT INTO department SET ?", {
+                name: answer.addDepartment
+            },
+            function(err, res) {
+                if (err) throw err;
+                console.log(" Department Added!\n");
+                start();
+            }
+        );
+    });
+
+}
+
+
+function addPersona() {
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "What is the Persona name?"
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "What is the Salary?"
+            },
+            {
+                name: "department_id",
+                type: "rawlist",
+                choices: res.map(item => item.department_name),
+                message: "Select a Department?"
+            },
+        ]).then(function (answers) {
+            const newDepartment = res.find(deparment => deparment.department_name === answers.department_id);
+                connection.query("INSERT INTO persona SET ?",
+                {
+                    title: answers.title,
+                    salary: answers.salary,
+                    department_id: newDepartment.id 
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Peronsa Added");
+                    start();
+                }
+            );    
+        });          
+
+    })
+
+};
+
+
+// -- UPDATES -- // -- employees, persona //
+function updateEmployee() {
+    connection.query(`SELECT * FROM employees`, function (err, res) {
+      inquirer.prompt([
+        {
+          name: "update",
+          type: "rawlist",
+          message: "Which employee would you like to update?",
+          choices: res.map(item => item.first_name, item.last_name, item.id)
+      }
+    ]).then(function (answer) {
+        const employeeUpdate = res.find(item => item.id);
+        console.log(employeeUpdate);
+        updatedEmp(employeeUpdate);
+      })
+    })
+  };
+  
+  function updatedEmp(thisid) {
+    connection.query("SELECT * FROM persona", function (err, res) {
+      inquirer.prompt([
+        {
+        type: "rawlist",
+        name: "newPersona",
+        message: "What is the new Persona?",
+        choices: res.map(item => item.name, item.id)
+      }
+    ]).then(function (answer) {
+        connection.query("UPDATE employees SET persona_id = ? WHERE id = ?", [answer.newPersona, thisid],
+          function (err) {
+            if (err) throw err;
+            start();
+          }
+        );
+      })
+    })
+  };
+
 
 
 // -- DELETIONS -- // -- employee,
